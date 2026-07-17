@@ -5,6 +5,7 @@ import plotly.graph_objects as go
 from datetime import datetime
 import json
 import re
+import os
 
 st.set_page_config(page_title="Dashboard Renja BKPSDM", layout="wide", page_icon="📊")
 
@@ -31,12 +32,27 @@ def fmt_rp(val):
     int_part = f'{int(val):,}'.replace(',', '.')
     return f'Rp. {int_part},-'
 
+SEED_FILE = 'seed_data.json'
+
 if 'data_rows' not in st.session_state:
     st.session_state.data_rows = []
 if 'programs' not in st.session_state:
     st.session_state.programs = {}
 if 'kegiatans' not in st.session_state:
     st.session_state.kegiatans = {}
+if 'seeded' not in st.session_state:
+    st.session_state.seeded = False
+
+if not st.session_state.seeded and os.path.exists(SEED_FILE):
+    try:
+        with open(SEED_FILE) as f:
+            seed = json.load(f)
+        st.session_state.programs = seed.get('programs', {})
+        st.session_state.kegiatans = seed.get('kegiatans', {})
+        st.session_state.data_rows = seed.get('data_rows', [])
+        st.session_state.seeded = True
+    except:
+        pass
 
 st.markdown(f"""
 <div style="display:flex; align-items:center; gap:12px; margin-bottom:4px;">
